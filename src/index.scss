@@ -1,7 +1,8 @@
 html {
   /* Set global font size so 1rem will be 10px */
   /* We want all px measurements to be in rem */
-  font-size: 62.5%; // 1 rem = 10px; 10px/16px = 62.5%
+  //font-size: 62.5%; // 1 rem = 10px; 10px/16px = 62.5%
+  font-size: 30%;
 }
 
 body {
@@ -17,4 +18,12 @@ body {
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
     monospace;
+}
+
+button {
+  width: 10rem;
+  height: 5rem;
+  font-size: 3rem;
+  background-color: greenyellow;
+  color: black;
 }

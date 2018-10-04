@@ -1,10 +1,11 @@
 import React from 'react';
 import './Suit.scss';
+import SuitModel from "../../models/Suit";
 
 const suit = (props) => {
   let iconClasses = [];
 
-  switch (props.suit) {
+  switch (SuitModel.getSuitFromValue(props.suit)) {
     case 'Spade': iconClasses.push('icon__spade'); break;
     case 'Club': iconClasses.push('icon__club'); break;
     case 'Heart': iconClasses.push('icon__heart'); break;
