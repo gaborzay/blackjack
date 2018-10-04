@@ -1,0 +1,38 @@
+$icon-spades: "\2660";
+$icon-clubs: "\2663";
+$icon-hearts: "\2665";
+$icon-diamonds: "\2666";
+$icon-size-small: 3rem;
+$icon-size-medium: 4.5rem;
+$icon-size-large: 6rem;
+
+.icon {
+  &--small {
+    font-size: $icon-size-small;
+  }
+
+  &--medium {
+    font-size: $icon-size-medium;
+  }
+
+  &--large {
+    font-size: $icon-size-large;
+  }
+
+  &__heart::after {
+    content: $icon-hearts;
+  }
+
+  &__spade::after {
+    content: $icon-spades;
+  }
+
+  &__club::after {
+    content: $icon-clubs;
+  }
+
+  &__diamond::after {
+    content: $icon-diamonds;
+  }
+}
+

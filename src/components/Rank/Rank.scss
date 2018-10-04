@@ -1,0 +1,17 @@
+$rank-size-small: 3rem;
+$rank-size-medium: 4rem;
+$rank-size-large: 5rem;
+
+.rank {
+  &--small {
+    font-size: $rank-size-small;
+  }
+
+  &--medium {
+    font-size: $rank-size-medium;
+  }
+
+  &--large {
+    font-size: $rank-size-large;
+  }
+}
