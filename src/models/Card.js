@@ -3,9 +3,10 @@ export default class Card {
   ui = null;
 
   constructor(options) {
-    this.rank = options['rank'];
-    this.suit = options['suit'];
-    this.faceValue = options['value'];
+    const {rank, suit, value} = options;
+    this.rank = rank;
+    this.suit = suit;
+    this.faceValue = value;
   }
 
   isAvailable = () => (this.available);
