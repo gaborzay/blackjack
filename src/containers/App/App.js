@@ -10,18 +10,35 @@ import Controller from '../../components/Controller/Controller';
 import DeckModel from "../../models/blackjack/BlackjackDeck";
 
 class App extends Component {
+  deck = null;
+  cardOptions = {
+    suits: [0, 1, 2, 3],
+    ranks: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13],
+  };
+  states = [
+    'initial',
+    'dealt',
+    'finished'
+  ];
+  messages = [
+    'Error',
+    'Push!',
+    'Player wins!',
+    'Dealer wins!',
+  ];
   state = {
-    game: 'deal',
+    gameState: this.states[0],
     dealerHand: null,
     playerHand: null,
+    dealerWins: 0,
+    playerWins: 0,
+    gameMessage: '',
     error: false,
     errorMessage: ''
   };
-  deck = null;
-  suits = [0, 1, 2, 3];
-  ranks = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13];
 
-  setDeckOfCards = (options) => {
+  // Set the playing Deck
+  initialize = (options) => {
     const {ranks, suits} = options;
     const deck = new DeckModel();
 
@@ -45,26 +62,58 @@ class App extends Component {
     return deck;
   };
 
+  // If player has gotten blackjack then turn goes to dealer
+  // to check if the deal has gotten blackjack
+  // If both deal and player have blackjack then it's a push
   deal = () => {
-    this.deck.resetDeckOfCards();
-    this.deck.shuffleDeckOfCards();
-    const dealerHand = this.deck.dealHand(2);
-    const playerHand = this.deck.dealHand(2);
-    this.setState({
-      dealerHand: dealerHand,
-      playerHand: playerHand,
-      game: 'dealt'
-    });
+    try {
+      this.deck.resetDeckOfCards();
+      this.deck.shuffleDeckOfCards();
+      const dealerHand = this.deck.dealHand(1);
+      const playerHand = this.deck.dealHand(2);
+
+      this.setState({
+        dealerHand: dealerHand,
+        playerHand: playerHand,
+        gameState: this.states[1]
+      });
+
+      if (playerHand.isBlackJack()) {
+        this.dealersTurn({
+          dealerHand: dealerHand,
+          playerHand: playerHand
+        });
+      }
+    } catch (e) {
+      console.error(e);
+      this.setState({
+        error: true,
+        errorMessage: e.message
+      });
+    }
   };
 
+  // If player hits then check if 21, or busted
+  // If 21 then dealers turn
+  // If busted then player loses
   hit = () => {
     try {
       const newCard = this.deck.dealCard();
-      let playerHand = this.state.playerHand;
+      let {playerHand} = this.state;
       playerHand.addCard(newCard);
+
       this.setState({
         playerHand: playerHand
       });
+
+      if (playerHand.is21()) {
+        this.stand();
+      } else if (playerHand.busted()) {
+        this.gameFinished({
+          dealerHand: this.state.dealerHand,
+          playerHand: playerHand
+        });
+      }
     } catch (e) {
       this.setState({
         error: true,
@@ -73,64 +122,116 @@ class App extends Component {
     }
   };
 
-  surrender = () => {
-    //
-  };
-
+  // If player stands, then it's the dealer's turn
   stand = () => {
-    //
+    this.dealersTurn({
+      dealerHand: this.state.dealerHand,
+      playerHand: this.state.playerHand
+    });
   };
 
-  checkScore = (hand) => {
-    let status = null;
+  // If the player surrenders, then the dealer wins
+  surrender = () => {
+    this.gameFinished({
+      dealerHand: this.state.dealerHand,
+      playerHand: this.state.playerHand
+    }, true);
+  };
 
-    if (hand.isBlackJack()) {
-      status = {
-        status: false,
-        message: 'blackjack'
-      };
-    } else if (hand.is21()) {
-      status = {
-        status: false,
-        message: '21'
-      };
-    } else if (hand.busted()) {
-      status = {
-        status: false,
-        message: 'busted'
-      };
+  // Let the dealer play out their hand
+  dealersTurn = (hands) => {
+    const {playerHand} = hands;
+    let {dealerHand} = hands;
+
+    if (playerHand.isBlackJack()) {
+      this.dealerHit(dealerHand);
     } else {
-      status = {
-        status: true,
-        message: ''
-      };
+      while (dealerHand.score() <= playerHand.score()) {
+        dealerHand = this.dealerHit(dealerHand);
+      }
     }
 
-    return {...status, score: hand.score()};
+    this.gameFinished({
+      dealerHand: dealerHand,
+      playerHand: playerHand
+    });
+  };
+
+  dealerHit = (dealerHand) => {
+    const newCard = this.deck.dealCard();
+    dealerHand.addCard(newCard);
+    this.setState({
+      dealerHand: dealerHand
+    });
+    return dealerHand;
+  };
+
+  // Calculate scores for game ending
+  gameFinished = (options, surrender = false) => {
+    const {playerHand} = options;
+    const {dealerHand} = options;
+    let {dealerWins} = this.state;
+    let {playerWins} = this.state;
+    let gameMessageID = 0;
+
+    if (
+      (playerHand.score() > dealerHand.score() && !playerHand.busted() && !surrender) ||
+      (dealerHand.busted())
+    ) {
+      gameMessageID = 2;
+      playerWins++;
+    } else if (
+      (dealerHand.score() > playerHand.score() && !dealerHand.busted()) ||
+      (playerHand.busted()) ||
+      surrender
+    ) {
+      gameMessageID = 3;
+      dealerWins++;
+    } else {
+      gameMessageID = 1;
+    }
+
+    this.setState({
+      gameState: this.states[2],
+      gameMessage: this.messages[gameMessageID],
+      dealerWins: dealerWins,
+      playerWins: playerWins
+    });
+  };
+
+  // Initialize the deck again
+  playAgain = () => {
+    this.deck = this.initialize(this.cardOptions);
+    this.setState({gameState: this.states[0]});
+    this.deal();
   };
 
   componentWillMount() {
-    const options = {
-      suits: this.suits,
-      ranks: this.ranks
-    };
-    this.deck = this.setDeckOfCards(options);
+    this.deck = this.initialize(this.cardOptions);
   }
 
   render() {
-    const dealerHand = this.state.dealerHand;
-    const playerHand = this.state.playerHand;
+    const {
+      dealerHand,
+      playerHand,
+      gameState,
+      gameMessage,
+      error,
+      errorMessage,
+      dealerWins,
+      playerWins
+    } = this.state;
     let controllerUI = null;
 
-    if (this.state.error) {
-      alert(this.state.errorMessage);
+    if (error) {
+      alert(errorMessage);
     }
 
-    switch (this.state.game) {
-      case 'deal':
+    switch (gameState) {
+      case this.states[0]:
         controllerUI = (<Button click={this.deal}>Deal</Button>);
         break;
-      case 'dealt':
+      case this.states[1]:
         controllerUI = (
           <React.Fragment>
             <Button click={this.hit}>Hit</Button>
@@ -139,19 +240,24 @@ class App extends Component {
           </React.Fragment>
         );
         break;
-      case 'stand':
-        controllerUI = null;
+      case this.states[2]:
+        controllerUI = <Button click={this.playAgain}>Play again?</Button>;
         break;
       default:
-        console.log(`Unknown game state: ${this.state.game}`);
+        console.log(`Unknown game state: ${gameState}`);
     }
 
     return (
       <div className="App">
-        <Hand player="Dealer" status={dealerHand ? this.checkScore(dealerHand) : null}>
+        <h1>
+          Dealer: <strong>{dealerWins}</strong> |
+          Player: <strong>{playerWins}</strong>
+        </h1>
+        <h1>{gameMessage}</h1>
+        <Hand player="Dealer" hand={dealerHand}>
           {dealerHand ? dealerHand.cards.map(card => (card.ui)) : null}
         </Hand>
-        <Hand player="Player" status={playerHand ? this.checkScore(playerHand) : null}>
+        <Hand player="Player" hand={playerHand}>
           {playerHand ? playerHand.cards.map(card => (card.ui)) : null}
         </Hand>
         <Controller>
