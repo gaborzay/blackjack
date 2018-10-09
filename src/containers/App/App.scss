@@ -9,20 +9,25 @@ $color-light-green: #3ab503;
   );
   color: white;
   text-align: center;
+  height: 100%;
 
-  &__message {
-    color: yellow;
-    font-size: 2rem;
-    padding: 3px;
+  &__game {
+    min-height: 70vh;
   }
 
-  &__game {}
-
-  &__controls {}
+  &__controls {
+    min-height: 20vh;
+  }
 
   &__scores {
     padding: 5px;
     font-size: 2rem;
     border-top: yellow 2px solid;
+  }
+
+  &__message {
+    color: yellow;
+    font-size: 2rem;
+    padding: 3px;
   }
 }

@@ -1,6 +1,6 @@
 .Hand {
   padding: 10px;
-  height: 35vh;
+  min-height: 35vh;
 
   &__heading {
     margin: 0;
@@ -14,6 +14,5 @@
 
   &__cards {
     clear: both;
-
   }
 }

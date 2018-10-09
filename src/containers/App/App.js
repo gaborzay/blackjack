@@ -4,7 +4,6 @@ import './App.scss';
 // Components
 import Hand from '../../components/Hand/Hand';
 import Card from '../../components/Card/Card';
-import Button from '../../components/UI/Button/Button';
 import Controller from '../../components/Controller/Controller';
 // Models
 import DeckModel from "../../models/blackjack/BlackjackDeck";
@@ -140,6 +139,7 @@ class App extends Component {
   };
 
   // Let the dealer play out their hand
+  // The dealer hits until it has at least 17
   dealersTurn = (hands) => {
     const {playerHand} = hands;
     let {dealerHand} = hands;
@@ -147,7 +147,7 @@ class App extends Component {
     if (playerHand.isBlackJack()) {
       this.dealerHit(dealerHand);
     } else {
-      while (dealerHand.score() <= playerHand.score()) {
+      while (dealerHand.score() <= playerHand.score() || dealerHand.score() < 17) {
         dealerHand = this.dealerHit(dealerHand);
       }
     }
@@ -222,35 +222,17 @@ class App extends Component {
       dealerWins,
       playerWins
     } = this.state;
-    let controllerUI = null;
 
     if (error) {
       alert(errorMessage);
     }
 
-    switch (gameState) {
-      case this.states[0]:
-        controllerUI = (<Button click={this.deal} text="Deal" color="green">D</Button>);
-        break;
-      case this.states[1]:
-        controllerUI = (
-          <React.Fragment>
-            <Button click={this.hit} text="Hit" color="yellow">H</Button>
-            <Button click={this.stand} text="Stand" color="green">St</Button>
-            {/*<Button click={this.surrender} text="Surrender" color="red">Su</Button>*/}
-          </React.Fragment>
-        );
-        break;
-      case this.states[2]:
-        controllerUI = <Button click={this.playAgain} text="Play again?" color="green">?</Button>;
-        break;
-      default:
-        console.log(`Unknown game state: ${gameState}`);
+    if (gameMessage !== '') {
+      alert(gameMessage);
     }
 
     return (
       <div className="App">
-        <div className="App__message">{gameMessage}&nbsp;</div>
         <div className="App__game">
           <Hand player="Dealer" hand={dealerHand}>
             {dealerHand ? dealerHand.cards.map(card => (card.ui)) : null}
@@ -260,9 +242,15 @@ class App extends Component {
           </Hand>
         </div>
         <div className="App__controls">
-          <Controller>
-            {controllerUI}
-          </Controller>
+          <Controller
+            gameState={gameState}
+            states={this.states}
+            deal={this.deal}
+            hit={this.hit}
+            stand={this.stand}
+            surrender={this.surrender}
+            again={this.playAgain}
+          />
         </div>
         <div className="App__scores">
           Dealer: <strong>{dealerWins}</strong> |
