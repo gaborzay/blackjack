@@ -1,0 +1,28 @@
+$color-green: #0a6c03;
+$color-light-green: #3ab503;
+
+.App {
+  background-image: radial-gradient(
+                  circle at top,
+                  $color-light-green,
+                  $color-green
+  );
+  color: white;
+  text-align: center;
+
+  &__message {
+    color: yellow;
+    font-size: 2rem;
+    padding: 3px;
+  }
+
+  &__game {}
+
+  &__controls {}
+
+  &__scores {
+    padding: 5px;
+    font-size: 2rem;
+    border-top: yellow 2px solid;
+  }
+}

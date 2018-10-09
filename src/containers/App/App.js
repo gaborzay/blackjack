@@ -75,7 +75,8 @@ class App extends Component {
       this.setState({
         dealerHand: dealerHand,
         playerHand: playerHand,
-        gameState: this.states[1]
+        gameState: this.states[1],
+        gameMessage: '',
       });
 
       if (playerHand.isBlackJack()) {
@@ -229,19 +230,19 @@ class App extends Component {
 
     switch (gameState) {
       case this.states[0]:
-        controllerUI = (<Button click={this.deal}>Deal</Button>);
+        controllerUI = (<Button click={this.deal} text="Deal" color="green">D</Button>);
         break;
       case this.states[1]:
         controllerUI = (
           <React.Fragment>
-            <Button click={this.hit}>Hit</Button>
-            <Button click={this.stand}>Stand</Button>
-            <Button click={this.surrender}>Surrender</Button>
+            <Button click={this.hit} text="Hit" color="yellow">H</Button>
+            <Button click={this.stand} text="Stand" color="green">St</Button>
+            {/*<Button click={this.surrender} text="Surrender" color="red">Su</Button>*/}
           </React.Fragment>
         );
         break;
       case this.states[2]:
-        controllerUI = <Button click={this.playAgain}>Play again?</Button>;
+        controllerUI = <Button click={this.playAgain} text="Play again?" color="green">?</Button>;
         break;
       default:
         console.log(`Unknown game state: ${gameState}`);
@@ -249,20 +250,24 @@ class App extends Component {
 
     return (
       <div className="App">
-        <h1>
+        <div className="App__message">{gameMessage}&nbsp;</div>
+        <div className="App__game">
+          <Hand player="Dealer" hand={dealerHand}>
+            {dealerHand ? dealerHand.cards.map(card => (card.ui)) : null}
+          </Hand>
+          <Hand player="Player" hand={playerHand}>
+            {playerHand ? playerHand.cards.map(card => (card.ui)) : null}
+          </Hand>
+        </div>
+        <div className="App__controls">
+          <Controller>
+            {controllerUI}
+          </Controller>
+        </div>
+        <div className="App__scores">
           Dealer: <strong>{dealerWins}</strong> |
           Player: <strong>{playerWins}</strong>
-        </h1>
-        <h1>{gameMessage}</h1>
-        <Hand player="Dealer" hand={dealerHand}>
-          {dealerHand ? dealerHand.cards.map(card => (card.ui)) : null}
-        </Hand>
-        <Hand player="Player" hand={playerHand}>
-          {playerHand ? playerHand.cards.map(card => (card.ui)) : null}
-        </Hand>
-        <Controller>
-          {controllerUI}
-        </Controller>
+        </div>
       </div>
     );
   }

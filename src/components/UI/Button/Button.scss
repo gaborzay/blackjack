@@ -1,3 +1,54 @@
+$color-white: #ffffff;
+$color-green: #0a6c03;
+$color-light-green: #3ab503;
+$color-red: #FF0000;
+$color-black: #000000;
+
 .Button {
-  font-size: 3em;
+  border-radius: 50%;
+  color: black;
+  display: inline-block;
+  font-size: 3rem;
+  margin: 0 auto;
+  width: 33%;
+
+  &__ui {
+    background-color: white;
+    border-radius: 50%;
+    border: 3px solid black;
+    box-shadow: 0 0 3px 1px black;
+    color: $color-white;
+    margin: 0 auto;
+    height: 6rem;
+    width: 6rem;
+
+    &--green {
+      background-color: $color-light-green;
+    }
+
+    &--yellow {
+      background-color: yellow;
+      color: black;
+    }
+
+    &--red {
+      background-color: $color-red;
+    }
+
+    &--black {
+      background-color: $color-black;
+    }
+  }
+
+  &__icon {
+    display: table-cell;
+    height: 6rem;
+    width: 6rem;
+    vertical-align: middle;
+  }
+
+  &__text {
+    font-size: 1.5rem;
+    color: yellow;
+  }
 }

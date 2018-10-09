@@ -1,13 +1,19 @@
 .Hand {
   padding: 10px;
-  margin: 10px;
-  border: 1px solid yellow;
+  height: 35vh;
 
   &__heading {
+    margin: 0;
+    float: left;
+  }
 
+  &__score {
+    margin: 0;
+    float: right;
   }
 
   &__cards {
+    clear: both;
 
   }
 }

@@ -1,16 +1,21 @@
 $card-icon-inset: 1rem;
 $color-red: #FF0000;
 $color-black: #000000;
+$color-white: #ffffff;
 
 .card {
-  width: 25rem;
-  height: 35rem;
+  width: 12.5rem;
+  height: 17.5rem;
   border: solid .2rem;
   border-radius: 2rem;
   display: inline-block;
-  margin: 2.5rem;
+  margin: 1rem;
   position: relative;
-  box-shadow: 0 0 5px 1px rgba(0, 0, 0, 0.75);
+  background-color: $color-white;
+
+  &:not(:first-child) {
+    margin-left: -10rem;
+  }
 
   &--black {
     border-color: $color-black;
@@ -24,7 +29,7 @@ $color-black: #000000;
 
   &__value {
     position: absolute;
-    line-height: 3.5rem;
+    line-height: 1rem;
     text-align: center;
   }
 
