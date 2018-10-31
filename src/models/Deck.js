@@ -7,13 +7,12 @@ export default class Deck {
   dealtIndex = 0;
 
   addCardToDeck = (options) => {
-    const {rank, suit, value, ui} = options;
+    const {rank, suit, value} = options;
     const card = new CardModel({
       rank: rank,
       suit: new SuitModel(suit),
       value: value
     });
-    card.setUI(ui);
     this.cards.push(card);
   };
 

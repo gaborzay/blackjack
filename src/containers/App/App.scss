@@ -13,6 +13,19 @@ $color-light-green: #3ab503;
 
   &__game {
     min-height: 70vh;
+    margin-top: 5vh;
+  }
+
+  &__popup {
+    position: fixed;
+    width: 50vw;
+    font-size: 2rem;
+    top: 45%;
+    border-radius: 5px;
+    background-color: black;
+    padding: 1rem 0;
+    z-index: 10;
+    margin: 0 25vw;
   }
 
   &__controls {
@@ -22,7 +35,12 @@ $color-light-green: #3ab503;
   &__scores {
     padding: 5px;
     font-size: 2rem;
-    border-top: yellow 2px solid;
+    border-bottom: yellow 2px solid;
+    position: fixed;
+    top: 0;
+    width: 100%;
+    background-color: black;
+    height: 5vh;
   }
 
   &__message {
