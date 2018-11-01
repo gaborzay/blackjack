@@ -19,29 +19,29 @@ const controller = (props) => {
     click={props.again}
     text="Play again?"
     color="green">?</Button>;
-  // const surrenderButton = <Button
-  //   click={this.surrender}
-  //   text="Surrender"
-  //   color="red">Su</Button>;
   let controllerUI = null;
 
-  if (props.dealer.isInit && props.player.isInit) {
-    // Initial State
-    controllerUI = (dealButton);
-  } else if (!props.player.isFinished) {
-    // Player's Turn
-    controllerUI = (
+  switch (props.gameState) {
+    case 'GAME_INITIAL':
+      controllerUI = dealButton;
+      break;
+    case 'GAME_PLAYER':
+      controllerUI = (
       <React.Fragment>
         {hitButton}
         {standButton}
       </React.Fragment>
-    );
-  } else if (props.player.isFinished) {
-    // Dealer's Turn
-    // Game Finished
-    controllerUI = againButton;
-  } else {
-    console.log(`Unknown game state`);
+      );
+      break;
+    case 'GAME_DEALER':
+      // Don't show controls
+      break;
+    case 'GAME_FINISHED':
+      controllerUI = againButton;
+      break;
+    default:
+      console.log(`Unknown game state: ${props.gameState}`);
+      break;
   }
 
   return (

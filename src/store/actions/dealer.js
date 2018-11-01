@@ -1,8 +1,8 @@
 import * as actionTypes from './actionTypes';
 
-export const dealerInit = (hand) => {
+export const dealerDeal = (hand) => {
   return {
-    type: actionTypes.DEALER_INIT,
+    type: actionTypes.DEALER_DEAL,
     payload: {
       hand: hand
     }

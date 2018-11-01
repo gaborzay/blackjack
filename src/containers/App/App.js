@@ -8,13 +8,10 @@ import Card from '../../components/Card/Card';
 import Controller from '../../components/Controller/Controller';
 import * as actions from '../../store/actions';
 
-const TIME_OUT = 500;
+const DEALER_CARD_TIME_OUT = 500;
+const PLAYER_CARD_TIME_OUT = 250;
 
 class App extends Component {
-  state = {
-    error: false,
-    errorMessage: ''
-  };
   cardOptions = {
     suits: [0, 1, 2, 3],
     ranks: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13],
@@ -24,14 +21,33 @@ class App extends Component {
     this.props.onGameInit(this.cardOptions);
   }
 
-  componentDidMount() {
+  componentDidUpdate() {
     const {
-      playerIsFinished,
-      dealerIsFinished
+      gameState,
+      dealerHand,
+      playerHand
     } = this.props;
 
-    if (playerIsFinished && !dealerIsFinished) {
-      this.dealersTurn();
+    switch (gameState) {
+      case 'GAME_PLAYER':
+        if (playerHand.isBusted() || playerHand.is21()) {
+          this.props.onGamePlayerStand();
+        }
+        break;
+      case 'GAME_DEALER':
+        if (dealerHand.isBusted() || dealerHand.is21() || dealerHand.is17() || playerHand.isBusted()) {
+          this.props.onGameDealerStand(dealerHand, playerHand);
+        } else {
+          setTimeout(() => {
+            const {gameDeck} = this.props;
+            const card = gameDeck.dealCard();
+            this.props.onDealerHit(card);
+          }, DEALER_CARD_TIME_OUT);
+        }
+        break;
+      default:
+        console.log(`Unknown game state: ${gameState}`);
+        break;
     }
   }
 
@@ -40,68 +56,30 @@ class App extends Component {
   // If both deal and player have blackjack then it's a push
   deal = () => {
     this.props.onGameDeal();
-    const playerHand = this.props.gameDeck.dealHand(2);
     const dealerHand = this.props.gameDeck.dealHand(1);
-    this.props.onPlayerInit(playerHand);
-    this.props.onDealerInit(dealerHand);
-    if (playerHand.isBlackJack()) {
-      this.stand();
-    }
+    const playerHand = this.props.gameDeck.dealHand(2);
+    this.props.onDealerDeal(dealerHand);
+    this.props.onPlayerDeal(playerHand);
   };
 
-  // If player hits then check if 21, or busted
-  // If 21 then dealers turn
-  // If busted then player loses
+  // If player hits then check
+  // if 21: then dealers turn
+  // if busted: then dealers turn (player looses)
   hit = () => {
     setTimeout(() => {
       const card = this.props.gameDeck.dealCard();
       this.props.onPlayerHit(card);
-      if (this.props.playerIsBusted) {
-        this.stand();
-      } else if (this.props.is21) {
-        this.stand();
-      }
-    }, TIME_OUT/2);
+    }, PLAYER_CARD_TIME_OUT);
   };
 
   // If player stands, then it's the dealer's turn
   stand = () => {
-    this.props.onPlayerStand();
-    this.dealersTurn();
-  };
-
-  // If the player surrenders, then the dealer wins
-  surrender = () => {
-    this.props.onDealerWins();
+    this.props.onGamePlayerStand();
   };
 
   // Initialize the deck again
   playAgain = () => {
     this.deal();
-  };
-
-  // Let the dealer play out their hand
-  // The dealer hits until it has at least 17
-  dealersTurn = (surrender = false) => {
-    const {
-      gameDeck,
-      dealerHand,
-      playerHand,
-    } = this.props;
-
-    setTimeout(() => {
-      if (dealerHand.busted()) {
-        this.props.onPlayerWins();
-      } else if (dealerHand.score() <= playerHand.score() || dealerHand.score() < 17) {
-        const card = gameDeck.dealCard();
-        this.props.onDealerHit(card);
-        this.dealersTurn();
-      } else if (playerHand.score() > dealerHand.score() && !playerHand.busted() && !surrender) {
-        this.props.onPlayerWins();
-      } else {
-        this.props.onDealerWins()
-      }
-    }, TIME_OUT);
   };
 
   getCardsFromHand = (hand) => {
@@ -115,31 +93,17 @@ class App extends Component {
 
   render() {
     const {
-      error,
-      errorMessage
-    } = this.state;
-    const {
       gameMessage,
-      dealerWins,
-      playerWins,
+      gameState,
       dealerHand,
-      dealerIsBlackjack,
-      dealerIsBusted,
-      dealerIs21,
-      dealerIsFinished,
       playerHand,
-      playerIsBlackjack,
-      playerIsBusted,
-      playerIs21,
-      playerIsFinished,
+      dealerWins,
+      playerWins
     } = this.props;
     const dealerCards = this.getCardsFromHand(dealerHand);
     const playerCards = this.getCardsFromHand(playerHand);
-    const popup = gameMessage ? <div className="App__popup">{gameMessage}</div> : null;
-
-    if (error) {
-      alert(errorMessage);
-    }
+    const popup = gameMessage ?
+      <div className="App__popup">{gameMessage}</div> : null;
 
     return (
       <div className="App">
@@ -148,40 +112,13 @@ class App extends Component {
           Player: <strong>{playerWins}</strong>
         </div>
         <div className="App__game">
-          <Hand
-            player="Dealer"
-            hand={dealerHand}
-            isBlackJack={dealerIsBlackjack}
-            isBusted={dealerIsBusted}
-            is21={dealerIs21}>
-            {dealerCards}
-          </Hand>
+          <Hand player="Dealer" hand={dealerHand}>{dealerCards} </Hand>
+          <Hand player="Player" hand={playerHand}>{playerCards}</Hand>
           {popup}
-          <Hand
-            player="Player"
-            hand={playerHand}
-            isBlackJack={playerIsBlackjack}
-            isBusted={playerIsBusted}
-            is21={playerIs21}>
-            {playerCards}
-          </Hand>
         </div>
         <div className="App__controls">
           <Controller
-            dealer={{
-              isInit: dealerHand === null,
-              isBlackjack: dealerIsBlackjack,
-              isBusted: dealerIsBusted,
-              is21: dealerIs21,
-              isFinished: dealerIsFinished,
-            }}
-            player={{
-              isInit: playerHand === null,
-              isBlackjack: playerIsBlackjack,
-              isBusted: playerIsBusted,
-              is21: playerIs21,
-              isFinished: playerIsFinished,
-            }}
+            gameState={gameState}
             deal={this.deal}
             hit={this.hit}
             stand={this.stand}
@@ -194,44 +131,37 @@ class App extends Component {
   }
 }
 
-const mapStateToProps = state => {
-  return {
-    // Game
-    gameDeck: state.game.deck,
-    gameState: state.game.state,
-    gameMessage: state.game.message,
-    dealerWins: state.game.dealerWins,
-    playerWins: state.game.playerWins,
-    // Dealer
-    dealerHand: state.dealer.hand,
-    dealerIsBlackjack: state.dealer.isBlackJack,
-    dealerIsBusted: state.dealer.isBusted,
-    dealerIs21: state.dealer.is21,
-    dealerIsFinished: state.dealer.isFinished,
-    // Player
-    playerHand: state.player.hand,
-    playerIsBlackjack: state.player.isBlackJack,
-    playerIsBusted: state.player.isBusted,
-    playerIs21: state.player.is21,
-    playerIsFinished: state.player.isFinished,
+const
+  mapStateToProps = state => {
+    return {
+      // Game
+      gameDeck: state.game.deck,
+      gameState: state.game.state,
+      gameMessage: state.game.message,
+      dealerWins: state.game.dealerWins,
+      playerWins: state.game.playerWins,
+      // Dealer
+      dealerHand: state.dealer.hand,
+      // Player
+      playerHand: state.player.hand,
+    };
   };
-};
 
-const mapDispatchToProps = dispatch => {
-  return {
-    // Game
-    onGameInit: (options) => dispatch(actions.gameInit(options)),
-    onGameDeal: () => dispatch(actions.gameDeal()),
-    // Dealer
-    onDealerInit: (hand) => dispatch(actions.dealerInit(hand)),
-    onDealerHit: (card) => dispatch(actions.dealerHit(card)),
-    onDealerWins: () => dispatch(actions.gameDealerWins()),
-    // Player
-    onPlayerInit: (hand) => dispatch(actions.playerInit(hand)),
-    onPlayerHit: (card) => dispatch(actions.playerHit(card)),
-    onPlayerStand: () => dispatch(actions.playerStand()),
-    onPlayerWins: () => dispatch(actions.gamePlayerWins()),
+const
+  mapDispatchToProps = dispatch => {
+    return {
+      // Game
+      onGameInit: (options) => dispatch(actions.gameInit(options)),
+      onGameDeal: () => dispatch(actions.gameDeal()),
+      onGamePlayerStand: () => dispatch(actions.gamePlayerStand()),
+      onGameDealerStand: (dealerHand, playerHand) => dispatch(actions.gameDealerStand(dealerHand, playerHand)),
+      // Dealer
+      onDealerDeal: (hand) => dispatch(actions.dealerDeal(hand)),
+      onDealerHit: (card) => dispatch(actions.dealerHit(card)),
+      // Player
+      onPlayerDeal: (hand) => dispatch(actions.playerDeal(hand)),
+      onPlayerHit: (card) => dispatch(actions.playerHit(card)),
+    };
   };
-};
 
 export default connect(mapStateToProps, mapDispatchToProps)(App);

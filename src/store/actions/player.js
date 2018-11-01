@@ -1,8 +1,8 @@
 import * as actionTypes from './actionTypes';
 
-export const playerInit = (hand) => {
+export const playerDeal = (hand) => {
   return {
-    type: actionTypes.PLAYER_INIT,
+    type: actionTypes.PLAYER_DEAL,
     payload: {
       hand: hand
     }
@@ -15,17 +15,5 @@ export const playerHit = (card) => {
     payload: {
       card: card
     }
-  };
-};
-
-export const playerStand = () => {
-  return {
-    type: actionTypes.PLAYER_STAND
-  };
-};
-
-export const playerSurrender = () => {
-  return {
-    type: actionTypes.PLAYER_SURRENDER
   };
 };

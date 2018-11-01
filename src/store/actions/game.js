@@ -30,20 +30,18 @@ export const gameDeal = () => {
   };
 };
 
-export const gameDealerWins = () => {
+export const gamePlayerStand = () => {
   return {
-    type: actionTypes.GAME_DEALER_WINS
+    type: actionTypes.GAME_PLAYER_STAND
   };
 };
 
-export const gamePlayerWins = () => {
+export const gameDealerStand = (dealerHand, playerHand) => {
   return {
-    type: actionTypes.GAME_PLAYER_WINS
-  };
-};
-
-export const gamePlayAgain = () => {
-  return {
-    type: actionTypes.GAME_PLAY_AGAIN
+    type: actionTypes.GAME_DEALER_STAND,
+    payload: {
+      dealerHand,
+      playerHand
+    }
   };
 };

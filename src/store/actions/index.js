@@ -1,19 +1,16 @@
 export {
   gameInit,
   gameDeal,
-  gameDealerWins,
-  gamePlayerWins,
-  gamePlayAgain
+  gamePlayerStand,
+  gameDealerStand,
 } from './game'
 
 export {
-  playerInit,
+  playerDeal,
   playerHit,
-  playerStand,
-  playerSurrender
 } from './player';
 
 export {
-  dealerInit,
-  dealerHit
+  dealerDeal,
+  dealerHit,
 } from './dealer';

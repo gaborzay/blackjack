@@ -31,9 +31,11 @@ export default class BlackjackHand extends Hand {
     return [minScore, maxScore];
   };
 
-  busted = () => (this.score() > 21);
+  isBlackJack = () => (this.cards.length === 2 && this.score() === 21);
+
+  isBusted = () => (this.score() > 21);
+
+  is17 = () => (this.score() > 16);
 
   is21 = () => (this.score() === 21);
-
-  isBlackJack = () => (this.cards.length === 2 && this.score() === 21);
 }
