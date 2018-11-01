@@ -1,18 +1,10 @@
-$color-green: #0a6c03;
-$color-light-green: #3ab503;
-
 .App {
-  background-image: radial-gradient(
-                  circle at top,
-                  $color-light-green,
-                  $color-green
-  );
   color: white;
   text-align: center;
   height: 100%;
 
   &__game {
-    min-height: 70vh;
+    min-height: 75vh;
     margin-top: 5vh;
   }
 
@@ -20,7 +12,7 @@ $color-light-green: #3ab503;
     position: fixed;
     width: 50vw;
     font-size: 2rem;
-    top: 45%;
+    top: 30%;
     border-radius: 5px;
     background-color: black;
     padding: 1rem 0;
@@ -29,11 +21,10 @@ $color-light-green: #3ab503;
   }
 
   &__controls {
-    min-height: 20vh;
+    min-height: 17vh;
   }
 
   &__scores {
-    padding: 5px;
     font-size: 2rem;
     border-bottom: yellow 2px solid;
     position: fixed;
@@ -41,6 +32,7 @@ $color-light-green: #3ab503;
     width: 100%;
     background-color: black;
     height: 5vh;
+    z-index: 10;
   }
 
   &__message {

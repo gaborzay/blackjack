@@ -5,6 +5,7 @@ $color-red: #FF0000;
 $color-black: #000000;
 
 .Button {
+  user-select: none;
   border-radius: 50%;
   color: black;
   display: inline-block;

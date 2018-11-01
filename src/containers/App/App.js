@@ -103,7 +103,11 @@ class App extends Component {
     const dealerCards = this.getCardsFromHand(dealerHand);
     const playerCards = this.getCardsFromHand(playerHand);
     const popup = gameMessage ?
-      <div className="App__popup">{gameMessage}</div> : null;
+      <div className="App__popup">
+        {gameMessage}
+        <h4>Dealer: {dealerHand.score()}</h4>
+        <h4>Player: {playerHand.score()}</h4>
+        </div> : null;
 
     return (
       <div className="App">

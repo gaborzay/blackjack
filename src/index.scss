@@ -1,3 +1,6 @@
+$color-green: #0a6c03;
+$color-light-green: #3ab503;
+
 html {
   /* Set global font size so 1rem will be 10px */
   /* We want all px measurements to be in rem */
@@ -12,6 +15,11 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  background-image: radial-gradient(
+                  circle at top,
+                  $color-light-green,
+                  $color-green
+  );
 }
 
 code {
